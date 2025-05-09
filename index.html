@@ -14,18 +14,19 @@
     }
 
     @font-face {
-      font-family: 'BookkMyungjo-Rg';
-      src: url('./BookkMyungjo-Regular.woff') format('woff');
+      font-family: 'BookkMyungjo-Lg';
+      src: url('./BookkMyungjo_Light.woff') format('woff');
       font-weight: 400;
       font-style: normal;
     }
 
     body {
       margin: 0;
-      background: linear-gradient(to bottom, #81B5D6 0%, #D0BFAA 50%, #F5A373 100%);
+      background: linear-gradient(to bottom, #53a6ef 0%, #caebff 60%, #ff9b61 100%);
       padding: 5vw;
       color: white;
       line-height: 1.6;
+      overflow-x: hidden;
     }
 
     .container {
@@ -34,38 +35,48 @@
     }
 
     h1 {
-      font-family: 'BookkMyungjo-Bd', serif;
-      font-weight: 700;
-      font-size: 6vw;
+      font-family: 'BookkMyungjo-Lg', serif;
+      font-weight: 400;
+      font-size: 4vw;
       margin-bottom: 1vw;
     }
 
     h2 {
-      font-family: 'BookkMyungjo-Bd', serif;
-      font-weight: 700;
-      font-size: 5vw;
+      font-family: 'BookkMyungjo-Lg', serif;
+      font-weight: 400;
+      font-size: 4vw;
       margin-top: 0;
       margin-bottom: 6vw;
     }
 
     hr {
       border: none;
-      border-top: 1px dashed rgba(255, 255, 255, 0.5);
+      height: 1px;
+      background: repeating-linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.5),
+        rgba(255, 255, 255, 0.5) 3px,
+        transparent 8px,
+        transparent 12px
+      );
       margin: 2vw 0 6vw 0;
     }
 
     p {
-      font-family: 'BookkMyungjo-Rg', serif;
+      font-family: 'BookkMyungjo-Lg', serif;
       font-weight: 400;
       font-size: 4vw;
     }
 
+    .scatter {
+      position: relative;
+      overflow: visible;
+    }
+    
     .scatter span {
       display: inline-block;
       will-change: transform, opacity;
     }
-    
-
     
   </style>
 </head>
@@ -79,11 +90,12 @@
     </p>
     <p class="scatter">
       If you go by whistling, your nose a-tilt behind the whistle, you will know it from below: window sills, flapping curtains, fountains. 
+    </p>
+    <p>
       If you walk along hanging your head, your nails dug into the palms of your
       hands, your gaze will be held on the ground, in the gutters, the manhole
       covers, the fish scales, wastepaper.
-    </p>
-    <p>
+      
       You cannot say that one aspect of the city is truer than the other, but you hear of
       the upper Zemrude chiefly from those who remember it, as they sink into the lower
       Zemrude, following every day the same stretches of street and finding again each morning the
