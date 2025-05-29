@@ -177,7 +177,24 @@
   function handleOrientation(event) {
     const beta = event.beta;
 
+    function updateGradient(beta) {
+  // Clamp and normalize beta: -90~180 → 0~1
+  let normalized = (beta + 90) / 270;
+  normalized = Math.max(0, Math.min(1, normalized));
+
+  // Adjust midpoint between blue and orange
+  const mid = Math.round(normalized * 100);
+
+  document.body.style.background = `
+    linear-gradient(to bottom,
+      #53a6ef 0%,
+      #caebff ${mid}%,
+      #ff9b61 100%)`;
+}
+
+
     if (beta !== null) {
+      updateGradient(beta);
       if (beta < -20) {
         switchToReality();  // 화면 위로 향할 때
       } else if (beta > 160) {
