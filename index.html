@@ -114,13 +114,12 @@
     </p>
   </div>
 
-   <script>
+  <script>
   const target = document.querySelector('.scatter');
   const text = target.textContent;
   target.textContent = '';
 
   const spans = [];
-
   text.split('').forEach(char => {
     if (char === ' ') {
       target.appendChild(document.createTextNode(' '));
@@ -132,15 +131,13 @@
     }
   });
 
-  let scattered = false;
-  let restored = false;
-
   const otherParagraphs = document.querySelectorAll('p:not(.scatter)');
 
-  function scatterTextWithGravity() {
-    if (scattered) return;
-    scattered = true;
-    restored = false;
+  let currentMode = "default"; // "reality", "illusion"
+
+  function switchToReality() {
+    if (currentMode === "reality") return;
+    currentMode = "reality";
 
     spans.forEach(span => {
       const angle = Math.random() * Math.PI * 2;
@@ -160,10 +157,9 @@
     otherParagraphs.forEach(p => gsap.to(p, { opacity: 1, duration: 1 }));
   }
 
-  function restoreTextWithFadeIn() {
-    if (restored) return;
-    restored = true;
-    scattered = false;
+  function switchToIllusion() {
+    if (currentMode === "illusion") return;
+    currentMode = "illusion";
 
     spans.forEach(span => {
       gsap.to(span, {
@@ -183,22 +179,21 @@
 
     if (beta !== null) {
       if (beta < -20) {
-        scatterTextWithGravity();  // 화면 위로 향할 때
+        switchToReality();  // 화면 위로 향할 때
       } else if (beta > 160) {
-        restoreTextWithFadeIn();   // 화면 아래로 향할 때
+        switchToIllusion(); // 화면 아래로 향할 때
       }
     }
   }
 
   if (window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', handleOrientation);
-  } else {
-    console.log("Device orientation not supported.");
   }
 
-  // 처음에는 다른 p를 다 보이게
+  // 초기 상태 설정
   otherParagraphs.forEach(p => p.style.opacity = 1);
 </script>
+
 
 </body>
 </html>
