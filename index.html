@@ -20,24 +20,25 @@
       font-style: normal;
     }
 
-html {
-  background: linear-gradient(to bottom, #53a6ef 0%, #caebff 60%, #ff9b61 100%);
-}
+    html {
+      overflow-x: hidden;
+      background: none;
+    }
 
-body {
-  margin: 0;
-  padding: 5vw 0;
-  color: white;
-  line-height: 1.6;
-  overflow-x: hidden;
-  background: transparent;
-}
-
-.container {
-  width: 100%;
-  padding: 0 5vw;
-  margin: auto;
-}
+    body {
+      margin: 0;
+      padding: 5vw 0;
+      color: white;
+      line-height: 1.6;
+      background: linear-gradient(to bottom, #53a6ef 0%, #caebff 60%, #ff9b61 100%);
+      min-height: 100vh;
+    }
+    
+    .container {
+      width: 100%;
+      padding: 0 5vw;
+      margin: auto;
+    }
 
     h1 {
       font-family: 'BookkMyungjo-Lg', serif;
@@ -76,6 +77,8 @@ body {
     .scatter {
       position: relative;
       overflow: visible;
+      max-width: 100%;
+      word-break: break-word;
     }
     
     .scatter span {
