@@ -107,45 +107,61 @@
     </p>
   </div>
 
-  <script>
-    const target = document.querySelector('.scatter');
-    const text = target.textContent;
-    target.textContent = '';
+<script>
+  const target = document.querySelector('.scatter');
+  const text = target.textContent;
+  target.textContent = '';
 
-    // 문자별로 처리하되 공백은 span으로 감싸지 않음
-    const spans = [];
+  const spans = [];
 
-    text.split('').forEach(char => {
-      if (char === ' ') {
-        target.appendChild(document.createTextNode(' ')); // span 대신 일반 공백
-      } else {
-        const span = document.createElement('span');
-        span.textContent = char;
-        target.appendChild(span);
-        spans.push(span);
-      }
+  text.split('').forEach(char => {
+    if (char === ' ') {
+      target.appendChild(document.createTextNode(' '));
+    } else {
+      const span = document.createElement('span');
+      span.textContent = char;
+      target.appendChild(span);
+      spans.push(span);
+    }
+  });
+
+  let scattered = false;
+
+  function scatterTextWithGravity() {
+    if (scattered) return;
+    scattered = true;
+
+    spans.forEach(span => {
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = Math.random() * 200 + 100;
+      const vx = Math.cos(angle) * velocity;
+      const vy = Math.sin(angle) * velocity - 300;
+
+      gsap.to(span, {
+        x: `+=${vx}`,
+        y: `+=${vy}`,
+        opacity: 0,
+        duration: 2,
+        ease: "power4.in",
+      });
     });
 
+    window.removeEventListener('deviceorientation', handleOrientation);
+  }
 
-
-    function scatterTextWithGravity() {
-      spans.forEach(span => {
-        const angle = Math.random() * Math.PI * 2;
-        const velocity = Math.random() * 200 + 100;
-        const vx = Math.cos(angle) * velocity;
-        const vy = Math.sin(angle) * velocity - 300;
-
-        gsap.to(span, {
-          x: `+=${vx}`,
-          y: `+=${vy}`,
-          opacity: 0,
-          duration: 2,
-          ease: "power4.in",
-        });
-      });
+  function handleOrientation(event) {
+    const beta = event.beta;
+    if (beta !== null && beta < -60) {
+      scatterTextWithGravity();
     }
+  }
 
-    setTimeout(scatterTextWithGravity, 3000);
-  </script>
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', handleOrientation);
+  } else {
+    console.log("Device orientation not supported.");
+  }
+</script>
+
 </body>
 </html>
