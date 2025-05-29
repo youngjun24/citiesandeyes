@@ -158,7 +158,7 @@
 
     function handleOrientation(event) {
       const beta = event.beta;
-      if (beta !== null && beta < -60) {  // 휴대폰이 아래로 향할 때
+      if (beta !== null && beta > -60) {  // 휴대폰이 아래로 향할 때
         scatterTextWithGravity();
       }
     }
