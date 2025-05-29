@@ -25,7 +25,7 @@
       padding: 0;
       overflow-x: hidden;           /* ✅ 글자 날아가도 가로 확장 방지 */
       background: linear-gradient(to bottom, #53a6ef 0%, #caebff 60%, #ff9b61 100%);
-  background-size: 100%;
+  background-size: 100% 100%;
   background-position: center 33.33%; /* 초기값 */
   transition: background-position 0.2s ease-out;
     }
@@ -181,15 +181,13 @@
     const beta = event.beta;
 
 function updateGradient(beta) {
-  // Normalize beta: -90~180 → 0~1
   let normalized = (beta + 90) / 270;
   normalized = Math.max(0, Math.min(1, normalized));
 
-  // Move background vertically: 0% (top) ~ 100% (bottom)
-  const position = 100 - normalized * 100;
-
+  const position = 80 - normalized * 60;
   document.body.style.backgroundPosition = `center ${position}%`;
 }
+
 
 
 
