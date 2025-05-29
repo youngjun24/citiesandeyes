@@ -24,7 +24,6 @@
       margin: 0;
       padding: 0;
       overflow-x: hidden;           /* ✅ 글자 날아가도 가로 확장 방지 */
-      background: linear-gradient(to bottom, #53a6ef 0%, #caebff 60%, #ff9b61 100%);
     }
 
     body {
@@ -177,20 +176,23 @@
   function handleOrientation(event) {
     const beta = event.beta;
 
-    function updateGradient(beta) {
-  // Clamp and normalize beta: -90~180 → 0~1
-  let normalized = (beta + 90) / 270;
-  normalized = Math.max(0, Math.min(1, normalized));
+  function updateGradient(beta) {
+    // Normalize beta from -90~180 → 0~1
+    let normalized = (beta + 90) / 270;
+    normalized = Math.max(0, Math.min(1, normalized));
+  
+    // Compute blue and orange zone split
+    const blueStop = 100 - normalized * 90;   // blue dominates when beta is low
+    const orangeStart = blueStop + 1;         // 1% gap for smooth transition
+  
+    document.body.style.background = `
+      linear-gradient(to bottom,
+        #53a6ef 0%,
+        #53a6ef ${blueStop}%,
+        #ff9b61 ${orangeStart}%,
+        #ff9b61 100%)`;
+  }
 
-  // Adjust midpoint between blue and orange
-  const mid = Math.round(normalized * 100);
-
-  document.body.style.background = `
-    linear-gradient(to bottom,
-      #53a6ef 0%,
-      #caebff ${mid}%,
-      #ff9b61 100%)`;
-}
 
 
     if (beta !== null) {
