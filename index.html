@@ -114,60 +114,91 @@
     </p>
   </div>
 
-  <script>
-    const target = document.querySelector('.scatter');
-    const text = target.textContent;
-    target.textContent = '';
+   <script>
+  const target = document.querySelector('.scatter');
+  const text = target.textContent;
+  target.textContent = '';
 
-    const spans = [];
+  const spans = [];
 
-    text.split('').forEach(char => {
-      if (char === ' ') {
-        target.appendChild(document.createTextNode(' '));
-      } else {
-        const span = document.createElement('span');
-        span.textContent = char;
-        target.appendChild(span);
-        spans.push(span);
-      }
+  text.split('').forEach(char => {
+    if (char === ' ') {
+      target.appendChild(document.createTextNode(' '));
+    } else {
+      const span = document.createElement('span');
+      span.textContent = char;
+      target.appendChild(span);
+      spans.push(span);
+    }
+  });
+
+  let scattered = false;
+  let restored = false;
+
+  const otherParagraphs = document.querySelectorAll('p:not(.scatter)');
+
+  function scatterTextWithGravity() {
+    if (scattered) return;
+    scattered = true;
+    restored = false;
+
+    spans.forEach(span => {
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = Math.random() * 200 + 100;
+      const vx = Math.cos(angle) * velocity;
+      const vy = Math.sin(angle) * velocity - 300;
+
+      gsap.to(span, {
+        x: `+=${vx}`,
+        y: `+=${vy}`,
+        opacity: 0,
+        duration: 2,
+        ease: "power4.in",
+      });
     });
 
-    let scattered = false;
+    otherParagraphs.forEach(p => gsap.to(p, { opacity: 1, duration: 1 }));
+  }
 
-    function scatterTextWithGravity() {
-      if (scattered) return;
-      scattered = true;
+  function restoreTextWithFadeIn() {
+    if (restored) return;
+    restored = true;
+    scattered = false;
 
-      spans.forEach(span => {
-        const angle = Math.random() * Math.PI * 2;
-        const velocity = Math.random() * 200 + 100;
-        const vx = Math.cos(angle) * velocity;
-        const vy = Math.sin(angle) * velocity - 300;
-
-        gsap.to(span, {
-          x: `+=${vx}`,
-          y: `+=${vy}`,
-          opacity: 0,
-          duration: 2,
-          ease: "power4.in",
-        });
+    spans.forEach(span => {
+      gsap.to(span, {
+        x: 0,
+        y: 0,
+        opacity: 1,
+        duration: 2,
+        ease: "power2.out",
       });
+    });
 
-      window.removeEventListener('deviceorientation', handleOrientation);
-    }
+    otherParagraphs.forEach(p => gsap.to(p, { opacity: 0, duration: 1 }));
+  }
 
-    function handleOrientation(event) {
-      const beta = event.beta;
-      if (beta !== null && beta < -20) {  // 휴대폰이 화면이 위를 향할 때
-        scatterTextWithGravity();
+  function handleOrientation(event) {
+    const beta = event.beta;
+
+    if (beta !== null) {
+      if (beta < -20) {
+        scatterTextWithGravity();  // 화면 위로 향할 때
+      } else if (beta > 160) {
+        restoreTextWithFadeIn();   // 화면 아래로 향할 때
       }
     }
+  }
 
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', handleOrientation);
-    } else {
-      console.log("Device orientation not supported.");
-    }
-  </script>
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', handleOrientation);
+  } else {
+    console.log("Device orientation not supported.");
+  }
+
+  // 처음에는 다른 p를 다 보이게
+  otherParagraphs.forEach(p => p.style.opacity = 1);
+</script>
+
 </body>
 </html>
