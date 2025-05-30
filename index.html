@@ -186,7 +186,7 @@ function updateGradient(beta) {
   normalized = Math.max(0, Math.min(1, normalized));
 
   // Move background vertically: 0% (top) ~ 100% (bottom)
-  const position = 90 - normalized * 20;
+  const position = normalized * 100;
 
   document.body.style.backgroundPosition = `center ${position}%`;
 }
