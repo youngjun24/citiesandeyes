@@ -181,12 +181,16 @@
     const beta = event.beta;
 
 function updateGradient(beta) {
+  // Normalize beta: -90~180 → 0~1
   let normalized = (beta + 90) / 270;
   normalized = Math.max(0, Math.min(1, normalized));
 
-  const position = 80 - normalized * 60;
+  // Move background vertically: 0% (top) ~ 100% (bottom)
+  const position = 100 - normalized * 60;
+
   document.body.style.backgroundPosition = `center ${position}%`;
 }
+
 
 
 
