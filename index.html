@@ -184,10 +184,10 @@
     let normalized = (beta + 90) / 270;
     normalized = Math.max(0, Math.min(1, normalized));
   
-    // ✅ 값이 커질수록 배경 아래로 이동 → 오렌지 올라옴
-    const position = normalized * 0;
+    const position = 100 - normalized * 100;
     document.body.style.backgroundPosition = `center ${position}%`;
   }
+
 
 
 
