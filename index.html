@@ -199,7 +199,7 @@
 
     if (beta !== null) {
       updateGradient(beta);
-      if (beta < 0) {
+      if (beta < 30) {
         switchToReality();  // 화면 위로 향할 때
       } else if (beta > 120) {
         switchToIllusion(); // 화면 아래로 향할 때
