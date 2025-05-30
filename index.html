@@ -53,7 +53,7 @@
     h2 {
       font-family: 'BookkMyungjo-Lg', serif;
       font-weight: 400;
-      font-size: 4vw;
+      font-size: 8vw;
       margin-top: 0;
       margin-bottom: 6vw;
     }
@@ -74,7 +74,7 @@
     p {
       font-family: 'BookkMyungjo-Lg', serif;
       font-weight: 400;
-      font-size: 4vw;
+      font-size: 8vw;
       margin: 0 0 4vw 0;
     }
 
@@ -92,7 +92,6 @@
 </head>
 <body>
   <div class="container">
-    <h1>보이지 않는 도시들 –</h1>
     <h2>Cities and eyes 2</h2>
     <hr />
     <p>
@@ -180,16 +179,17 @@
   function handleOrientation(event) {
     const beta = event.beta;
 
-function updateGradient(beta) {
-  // Normalize beta: -90~180 → 0~1
-  let normalized = (beta + 90) / 270;
-  normalized = Math.max(0, Math.min(1, normalized));
+  function updateGradient(beta) {
+    // Normalize beta: -90~180 → 0~1
+    let normalized = (beta + 90) / 270;
+    normalized = Math.max(0, Math.min(1, normalized));
+  
+    // Move background vertically: 0% (top) ~ 100% (bottom)
+    const position = 100 - normalized * 100;
+  
+    document.body.style.backgroundPosition = `center ${position}%`;
+  }
 
-  // Move background vertically: 0% (top) ~ 100% (bottom)
-  const position = normalized * 40;
-
-  document.body.style.backgroundPosition = `center ${position}%`;
-}
 
 
 
