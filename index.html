@@ -38,7 +38,7 @@
     }
 
     .container {
-      max-width: 80vw;             /* ✅ 좌우 여백 확보 */
+      max-width: 80vw;            
       margin: 0 auto;
       padding: 5vw 0;
     }
@@ -201,7 +201,7 @@ function updateGradient(beta) {
       updateGradient(beta);
       if (beta < -20) {
         switchToReality();  // 화면 위로 향할 때
-      } else if (beta > 160) {
+      } else if (beta > 120) {
         switchToIllusion(); // 화면 아래로 향할 때
       }
     }
