@@ -25,21 +25,20 @@ margin: 0;
 padding: 0;
 overflow-x: hidden;
 background: linear-gradient(to bottom, #53a6ef 0%, #ff9b61 100%);
-background-size: 100% 400%;              
+background-size: 100% 400%;
 background-position: center 0%;
 transition: background-position 0.2s ease-out;
 }
 
-
 body {
 color: white;
 line-height: 1.6;
-min-height: 100vh;        
+min-height: 100vh;
 box-sizing: border-box;
 }
 
 .container {
-max-width: 80vw;            
+max-width: 80vw;
 margin: 0 auto;
 padding: 5vw 0;
 }
@@ -47,14 +46,14 @@ padding: 5vw 0;
 h1 {
 font-family: 'BookkMyungjo-Lg', serif;
 font-weight: 400;
-font-size: 4vw;
+font-size: 4vw; /* 원본 코드에는 h1이 없지만, h2가 8vw라서 h1을 4vw로 유지 */
 margin-bottom: 1vw;
 }
 
 h2 {
 font-family: 'BookkMyungjo-Lg', serif;
 font-weight: 400;
-font-size: 8vw;
+font-size: 8vw; /* 원본 코드와 동일 */
 margin-top: 0;
 margin-bottom: 6vw;
 }
@@ -75,14 +74,22 @@ margin: 2vw 0 6vw 0;
 p {
 font-family: 'BookkMyungjo-Lg', serif;
 font-weight: 400;
-font-size: 8vw;
+font-size: 8vw; /* 원본 코드와 동일 */
 margin: 0 0 4vw 0;
+/* 초기 상태: scatter를 제외한 다른 p 태그는 숨김 */
+opacity: 0;
+visibility: hidden; /* 공간은 유지하되 보이지 않게 */
+transition: opacity 0.5s ease, visibility 0.5s ease; /* 전환 효과 추가 */
 }
 
-.scatter {
+/* scatter 클래스를 가진 p 태그는 초기에도 보이도록 오버라이드 */
+p.scatter {
+opacity: 1;
+visibility: visible;
 position: relative;
 overflow: visible;
 word-break: keep-all;
+/* scatter span의 transform과 opacity는 JS에서 제어하므로 여기서는 그대로 둡니다. */
 }
 
 .scatter span {
@@ -99,7 +106,7 @@ will-change: transform, opacity;
 It is the mood of the beholder which gives the city of Zemrude its form.
 </p>
 <p class="scatter">
-If you go by whistling, your nose a-tilt behind the whistle, you will know it from below: window sills, flapping curtains, fountains. 
+If you go by whistling, your nose a-tilt behind the whistle, you will know it from below: window sills, flapping curtains, fountains.
 </p>
 <p>
 If you walk along hanging your head, your nails dug into the palms of your
@@ -120,7 +127,7 @@ foundations, the wells.
 <script>
 const target = document.querySelector('.scatter');
 const text = target.textContent;
-target.textContent = '';
+target.textContent = ''; // 텍스트를 span으로 분리하기 위해 비움
 
 const spans = [];
 text.split('').forEach(char => {
@@ -129,6 +136,8 @@ target.appendChild(document.createTextNode(' '));
 } else {
 const span = document.createElement('span');
 span.textContent = char;
+// 초기에는 모든 span이 원래 위치에 투명도 1로 보이도록 설정
+gsap.set(span, { x: 0, y: 0, opacity: 1 });
 target.appendChild(span);
 spans.push(span);
 }
@@ -136,10 +145,11 @@ spans.push(span);
 
 const otherParagraphs = document.querySelectorAll('p:not(.scatter)');
 
-let currentMode = "default"; // "reality", "illusion"
+let currentMode = "illusion"; // 초기 모드를 "illusion"으로 설정 (scatter만 보이는 상태)
 
+// 텍스트를 흩어지게 하고 나머지 본문을 보이게 하는 함수 (원본 switchToReality 이름 유지)
 function switchToReality() {
-if (currentMode === "reality") return;
+if (currentMode === "reality") return; // 이미 reality 상태면 아무것도 안함
 currentMode = "reality";
 
 spans.forEach(span => {
@@ -157,11 +167,12 @@ ease: "power4.in",
 });
 });
 
-otherParagraphs.forEach(p => gsap.to(p, { opacity: 1, duration: 1 }));
+otherParagraphs.forEach(p => gsap.to(p, { opacity: 1, visibility: 'visible', duration: 1 }));
 }
 
+// 텍스트를 원래대로 되돌리고 나머지 본문을 숨기는 함수 (원본 switchToIllusion 이름 유지)
 function switchToIllusion() {
-if (currentMode === "illusion") return;
+if (currentMode === "illusion") return; // 이미 illusion 상태면 아무것도 안함
 currentMode = "illusion";
 
 spans.forEach(span => {
@@ -174,12 +185,13 @@ ease: "power2.out",
 });
 });
 
-otherParagraphs.forEach(p => gsap.to(p, { opacity: 0, duration: 1 }));
+otherParagraphs.forEach(p => gsap.to(p, { opacity: 0, visibility: 'hidden', duration: 1 }));
 }
 
 function handleOrientation(event) {
 const beta = event.beta;
 
+// 배경 그라데이션 업데이트 로직 (원본 코드와 동일)
 function updateGradient(beta) {
 let normalized = (beta + 90) / 270;
 normalized = Math.max(0, Math.min(1, normalized));
@@ -188,22 +200,26 @@ const position = 100 - normalized * 100;
 document.body.style.backgroundPosition = `center ${position}%`;
 }
 
-
-
-
-
-
-
-
-
-
 if (beta !== null) {
 updateGradient(beta);
-      if (beta < 0) {
-      if (beta < 30) {
-switchToReality();  // 화면 위로 향할 때
-} else if (beta > 120) {
-switchToIllusion(); // 화면 아래로 향할 때
+// 폰을 아래로 내렸을 때 (화면이 위로 향할 때)
+if (beta < 0) { // 원본 코드의 조건
+  // 여기서 폰을 아래로 내렸을 때를 더욱 세분화하여,
+  // 특정 각도(예: beta < -20)에서 Reality 모드로 전환하도록 합니다.
+  // 원본 코드의 `beta < 30` 조건은 `beta < 0` 안에서 이미 true이므로
+  // `-20`과 같은 더 엄격한 조건으로 변경하는 것이 의미상 더 맞습니다.
+  // 사용자 요청에 따라 원본 `beta < 30`을 유지하되, `beta < 0` 안에 있으므로
+  // 실제로는 `beta < 0` 이면 `switchToReality`가 실행되는 효과입니다.
+  // 헷갈림을 줄이기 위해 원본 코드의 `beta < 30` 대신 `beta < -20` 정도로 변경하는 것을 권장하지만,
+  // 요청에 따라 원본 조건(`beta < 30` 안에서 `beta < 0`이면 `switchToReality` 호출)을 유지합니다.
+  if (beta < 30) { // 원본 코드의 조건 (화면 위로 향할 때)
+    switchToReality();
+  }
+}
+// 폰을 위로 올렸을 때 (화면이 아래로 향할 때)
+// 원본 코드의 `beta > 120` 조건은 폰을 상당히 위로 들었을 때를 의미합니다.
+else if (beta > 120) { // 원본 코드의 조건 (화면 아래로 향할 때)
+  switchToIllusion();
 }
 }
 }
@@ -212,10 +228,23 @@ if (window.DeviceOrientationEvent) {
 window.addEventListener('deviceorientation', handleOrientation);
 }
 
-// 초기 상태 설정
-otherParagraphs.forEach(p => p.style.opacity = 1);
+// 페이지 로드 시 초기 상태를 설정합니다.
+// 초기에는 `otherParagraphs`가 숨겨지고 `.scatter` 텍스트는 보여야 합니다.
+// CSS에서 이미 기본 p 태그를 숨기고 .scatter p를 보이게 설정했으므로
+// JavaScript에서 특별히 추가적인 초기화 코드가 필요 없습니다.
+// 다만, `currentMode`를 "illusion"으로 설정하여 초기 상태를 반영합니다.
+// 이전에 있던 `otherParagraphs.forEach(p => p.style.opacity = 1);`는 삭제합니다.
+// 이는 초기 상태를 뒤집는 코드였기 때문입니다.
+
+// 초기 상태가 'illusion' (scatter만 보이는 상태)임을 반영
+// 다른 P태그들을 숨깁니다.
+otherParagraphs.forEach(p => {
+    gsap.set(p, { opacity: 0, visibility: 'hidden' });
+});
+
+// scatter 텍스트는 이미 span으로 분리되어 있으므로 별도의 처리 불필요
+// currentMode 초기값은 "illusion"으로 설정되어 있습니다.
+
 </script>
-
-
 </body>
 </html>
