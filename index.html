@@ -20,41 +20,41 @@
       font-style: normal;
     }
 
-      html, body {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    background: linear-gradient(to bottom, #53a6ef 0%, #ff9b61 100%);
-    background-size: 100% 400%;              
-    background-position: center 0%;
-    transition: background-position 0.2s ease-out;
-  }
-
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background: linear-gradient(to bottom, #53a6ef 0%, #caebff 60%, #ff9b61 100%);
+    }
 
     body {
       color: white;
       line-height: 1.6;
-      min-height: 100vh;        
+      min-height: 100vh;
       box-sizing: border-box;
     }
 
     .container {
-      max-width: 80vw;            
+      max-width: 80vw;
       margin: 0 auto;
       padding: 5vw 0;
     }
 
-    h1 {
+    h1, h2, hr, .initially-hidden {
+      display: none; /* 처음엔 감춤 */
+    }
+
+    h1, h2 {
       font-family: 'BookkMyungjo-Lg', serif;
       font-weight: 400;
       font-size: 4vw;
+    }
+
+    h1 {
       margin-bottom: 1vw;
     }
 
     h2 {
-      font-family: 'BookkMyungjo-Lg', serif;
-      font-weight: 400;
-      font-size: 8vw;
       margin-top: 0;
       margin-bottom: 6vw;
     }
@@ -75,7 +75,7 @@
     p {
       font-family: 'BookkMyungjo-Lg', serif;
       font-weight: 400;
-      font-size: 8vw;
+      font-size: 4vw;
       margin: 0 0 4vw 0;
     }
 
@@ -93,19 +93,20 @@
 </head>
 <body>
   <div class="container">
+    <h1>보이지 않는 도시들 –</h1>
     <h2>Cities and eyes 2</h2>
     <hr />
-    <p>
+    <p class="initially-hidden">
       It is the mood of the beholder which gives the city of Zemrude its form.
     </p>
     <p class="scatter">
       If you go by whistling, your nose a-tilt behind the whistle, you will know it from below: window sills, flapping curtains, fountains. 
     </p>
-    <p>
+    <p class="initially-hidden">
       If you walk along hanging your head, your nails dug into the palms of your
       hands, your gaze will be held on the ground, in the gutters, the manhole
       covers, the fish scales, wastepaper.
-      
+
       You cannot say that one aspect of the city is truer than the other, but you hear of
       the upper Zemrude chiefly from those who remember it, as they sink into the lower
       Zemrude, following every day the same stretches of street and finding again each morning the
@@ -118,103 +119,64 @@
   </div>
 
   <script>
-  const target = document.querySelector('.scatter');
-  const text = target.textContent;
-  target.textContent = '';
+    const target = document.querySelector('.scatter');
+    const text = target.textContent;
+    target.textContent = '';
 
-  const spans = [];
-  text.split('').forEach(char => {
-    if (char === ' ') {
-      target.appendChild(document.createTextNode(' '));
-    } else {
-      const span = document.createElement('span');
-      span.textContent = char;
-      target.appendChild(span);
-      spans.push(span);
+    const spans = [];
+
+    text.split('').forEach(char => {
+      if (char === ' ') {
+        target.appendChild(document.createTextNode(' '));
+      } else {
+        const span = document.createElement('span');
+        span.textContent = char;
+        target.appendChild(span);
+        spans.push(span);
+      }
+    });
+
+    let scattered = false;
+
+    function scatterTextWithGravity() {
+      if (scattered) return;
+      scattered = true;
+
+      spans.forEach(span => {
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 200 + 100;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity - 300;
+
+        gsap.to(span, {
+          x: `+=${vx}`,
+          y: `+=${vy}`,
+          opacity: 0,
+          duration: 2,
+          ease: "power4.in",
+        });
+      });
+
+      // 숨겨진 요소 보이게 하기
+      document.querySelectorAll('h1, h2, hr, .initially-hidden').forEach(el => {
+        el.style.display = 'block';
+      });
+
+      window.removeEventListener('deviceorientation', handleOrientation);
     }
-  });
 
-  const otherParagraphs = document.querySelectorAll('p:not(.scatter)');
-
-  let currentMode = "default"; // "reality", "illusion"
-
-  function switchToReality() {
-    if (currentMode === "reality") return;
-    currentMode = "reality";
-
-    spans.forEach(span => {
-      const angle = Math.random() * Math.PI * 2;
-      const velocity = Math.random() * 200 + 100;
-      const vx = Math.cos(angle) * velocity;
-      const vy = Math.sin(angle) * velocity - 300;
-
-      gsap.to(span, {
-        x: `+=${vx}`,
-        y: `+=${vy}`,
-        opacity: 0,
-        duration: 2,
-        ease: "power4.in",
-      });
-    });
-
-    otherParagraphs.forEach(p => gsap.to(p, { opacity: 1, duration: 1 }));
-  }
-
-  function switchToIllusion() {
-    if (currentMode === "illusion") return;
-    currentMode = "illusion";
-
-    spans.forEach(span => {
-      gsap.to(span, {
-        x: 0,
-        y: 0,
-        opacity: 1,
-        duration: 2,
-        ease: "power2.out",
-      });
-    });
-
-    otherParagraphs.forEach(p => gsap.to(p, { opacity: 0, duration: 1 }));
-  }
-
-  function handleOrientation(event) {
-    const beta = event.beta;
-
-  function updateGradient(beta) {
-    let normalized = (beta + 90) / 270;
-    normalized = Math.max(0, Math.min(1, normalized));
-  
-    const position = 100 - normalized * 100;
-    document.body.style.backgroundPosition = `center ${position}%`;
-  }
-
-
-
-
-
-
-
-
-
-
-    if (beta !== null) {
-      updateGradient(beta);
-      if (beta < 30) {
-        switchToReality();  // 화면 위로 향할 때
-      } else if (beta > 120) {
-        switchToIllusion(); // 화면 아래로 향할 때
+    function handleOrientation(event) {
+      const beta = event.beta;
+      if (beta !== null && beta < -20) {
+        scatterTextWithGravity();
       }
     }
-  }
 
-  if (window.DeviceOrientationEvent) {
-    window.addEventListener('deviceorientation', handleOrientation);
-  }
-
-  // 초기 상태 설정
-  otherParagraphs.forEach(p => p.style.opacity = 1);
-</script>
-
-
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', handleOrientation);
+    } else {
+      console.log("Device orientation not supported.");
+    }
+  </script>
 </body>
 </html>
