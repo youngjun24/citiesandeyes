@@ -79,8 +79,8 @@ margin: 0 0 4vw 0;
 /* 초기 상태: scatter를 제외한 다른 p 태그는 숨김 */
 opacity: 0;
 visibility: hidden; /* 공간은 유지하되 보이지 않게 */
-/* GSAP가 opacity를 제어하므로 CSS transition은 필요 없지만, fallback으로 남겨둘 수도 있습니다. */
-transition: opacity 0.5s ease; /* visibility는 GSAP onStart/onComplete로 제어 */
+/* 나타나고 사라지는 부드러운 transition 효과를 CSS에 다시 추가합니다. */
+transition: opacity 1s ease, visibility 1s ease; /* duration은 GSAP와 맞춥니다. */
 }
 
 /* scatter 클래스를 가진 p 태그는 초기에도 보이도록 오버라이드 */
@@ -166,13 +166,13 @@ ease: "power4.in",
 });
 });
 
-// ⭐ 수정된 부분: 본문이 나타날 때 visibility를 먼저 visible로 설정하고 opacity 애니메이션 시작 ⭐
+// ⭐ 본문 나타날 때 로직 (현재 유지 요청) ⭐
 otherParagraphs.forEach(p => {
     gsap.to(p, {
         opacity: 1,
-        duration: 1, // 나타나는 시간 (1초)
+        duration: 1, // 나타나는 시간
         ease: "power2.out",
-        onStart: () => { // 애니메이션 시작 시 실행
+        onStart: () => { // 애니메이션 시작 직전에 실행
             p.style.visibility = 'visible'; // 그때서야 visibility를 visible로 변경
         }
     });
@@ -194,11 +194,21 @@ ease: "power2.out",
 });
 });
 
-// ⭐ 수정된 부분: opacity 애니메이션이 완료된 후에 visibility를 hidden으로 설정 ⭐
+// ⭐ 본문 사라질 때 로직 (이전 버전으로 복구, CSS transition에 의존) ⭐
 otherParagraphs.forEach(p => {
+    // visibility를 바로 hidden으로 변경하지 않고 opacity만 GSAP로 제어합니다.
+    // CSS의 transition 속성이 visibility와 opacity 변화를 부드럽게 처리할 것입니다.
+    gsap.to(p, { opacity: 0, duration: 1, ease: "power2.out" });
+    // 중요: opacity가 0이 된 후 visibility: hidden으로 바뀌는 지연은 CSS transition에 맡기거나,
+    // JS에서 delay를 주거나, onComplete 콜백을 다시 추가해야 합니다.
+    // '팍' 사라지는 것을 막으려면, CSS의 'transition: visibility'가 작동해야 합니다.
+    // 하지만 GSAP가 직접 opacity를 제어하면 CSS transition이 오버라이드될 수 있습니다.
+    // 가장 확실한 방법은 사라질 때도 onComplete를 사용하는 것입니다.
+
+    // 다시 onComplete로 변경 (가장 안정적인 '스르륵' 사라짐)
     gsap.to(p, {
         opacity: 0,
-        duration: 1, // 사라지는 시간 (1초)
+        duration: 1, // 1초 동안 opacity가 0으로 변함
         ease: "power2.out",
         onComplete: () => { // 애니메이션 완료 시 실행
             p.style.visibility = 'hidden'; // 그때서야 visibility를 hidden으로 변경
