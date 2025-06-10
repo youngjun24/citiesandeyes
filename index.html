@@ -1,173 +1,221 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>보이지 않는 도시들 - Cities and eyes 2</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <style>
-    @font-face {
-      font-family: 'BookkMyungjo-Bd';
-      src: url('./BookkMyungjo-Bd.woff2') format('woff2');
-      font-weight: 700;
-      font-style: normal;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>보이지 않는 도시들 - Cities and eyes 2</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+@font-face {
+font-family: 'BookkMyungjo-Bd';
+src: url('./BookkMyungjo-Bd.woff2') format('woff2');
+font-weight: 700;
+font-style: normal;
+}
 
-    @font-face {
-      font-family: 'BookkMyungjo-Lg';
-      src: url('./BookkMyungjo_Light.woff') format('woff');
-      font-weight: 400;
-      font-style: normal;
-    }
+@font-face {
+font-family: 'BookkMyungjo-Lg';
+src: url('./BookkMyungjo_Light.woff') format('woff');
+font-weight: 400;
+font-style: normal;
+}
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;           /* ✅ 글자 날아가도 가로 확장 방지 */
-      background: linear-gradient(to bottom, #53a6ef 0%, #caebff 60%, #ff9b61 100%);
-    }
+html, body {
+margin: 0;
+padding: 0;
+overflow-x: hidden;
+background: linear-gradient(to bottom, #53a6ef 0%, #ff9b61 100%);
+background-size: 100% 400%;              
+background-position: center 0%;
+transition: background-position 0.2s ease-out;
+}
 
-    body {
-      color: white;
-      line-height: 1.6;
-      min-height: 100vh;           /* ✅ 최소 높이 보장 */
-      box-sizing: border-box;
-    }
 
-    .container {
-      max-width: 80vw;             /* ✅ 좌우 여백 확보 */
-      margin: 0 auto;
-      padding: 5vw 0;
-    }
+body {
+color: white;
+line-height: 1.6;
+min-height: 100vh;        
+box-sizing: border-box;
+}
 
-    h1 {
-      font-family: 'BookkMyungjo-Lg', serif;
-      font-weight: 400;
-      font-size: 4vw;
-      margin-bottom: 1vw;
-    }
+.container {
+max-width: 80vw;            
+margin: 0 auto;
+padding: 5vw 0;
+}
 
-    h2 {
-      font-family: 'BookkMyungjo-Lg', serif;
-      font-weight: 400;
-      font-size: 4vw;
-      margin-top: 0;
-      margin-bottom: 6vw;
-    }
+h1 {
+font-family: 'BookkMyungjo-Lg', serif;
+font-weight: 400;
+font-size: 4vw;
+margin-bottom: 1vw;
+}
 
-    hr {
-      border: none;
-      height: 1px;
-      background: repeating-linear-gradient(
-        to right,
-        rgba(255, 255, 255, 0.5),
-        rgba(255, 255, 255, 0.5) 3px,
-        transparent 8px,
-        transparent 12px
-      );
-      margin: 2vw 0 6vw 0;
-    }
+h2 {
+font-family: 'BookkMyungjo-Lg', serif;
+font-weight: 400;
+font-size: 8vw;
+margin-top: 0;
+margin-bottom: 6vw;
+}
 
-    p {
-      font-family: 'BookkMyungjo-Lg', serif;
-      font-weight: 400;
-      font-size: 4vw;
-      margin: 0 0 4vw 0;
-    }
+hr {
+border: none;
+height: 1px;
+background: repeating-linear-gradient(
+to right,
+rgba(255, 255, 255, 0.5),
+rgba(255, 255, 255, 0.5) 3px,
+transparent 8px,
+transparent 12px
+);
+margin: 2vw 0 6vw 0;
+}
 
-    .scatter {
-      position: relative;
-      overflow: visible;
-      word-break: keep-all;
-    }
+p {
+font-family: 'BookkMyungjo-Lg', serif;
+font-weight: 400;
+font-size: 8vw;
+margin: 0 0 4vw 0;
+}
 
-    .scatter span {
-      display: inline-block;
-      will-change: transform, opacity;
-    }
-  </style>
+.scatter {
+position: relative;
+overflow: visible;
+word-break: keep-all;
+}
+
+.scatter span {
+display: inline-block;
+will-change: transform, opacity;
+}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>보이지 않는 도시들 –</h1>
-    <h2>Cities and eyes 2</h2>
-    <hr />
-    <p>
-      It is the mood of the beholder which gives the city of Zemrude its form.
-    </p>
-    <p class="scatter">
-      If you go by whistling, your nose a-tilt behind the whistle, you will know it from below: window sills, flapping curtains, fountains. 
-    </p>
-    <p>
-      If you walk along hanging your head, your nails dug into the palms of your
-      hands, your gaze will be held on the ground, in the gutters, the manhole
-      covers, the fish scales, wastepaper.
-      
-      You cannot say that one aspect of the city is truer than the other, but you hear of
-      the upper Zemrude chiefly from those who remember it, as they sink into the lower
-      Zemrude, following every day the same stretches of street and finding again each morning the
-      ill-humor of the day before, encrusted at the foot of the walls. For everyone, sooner or later,
-      the day comes when we bring our gaze down along the drainpipes and we can no longer detach it
-      from the cobblestones. The reverse is not impossible, but it is more rare: and so we
-      continue walking through Zemrude's streets with eyes now digging into the cellars, the
-      foundations, the wells.
-    </p>
-  </div>
+<div class="container">
+<h2>Cities and eyes 2</h2>
+<hr />
+<p>
+It is the mood of the beholder which gives the city of Zemrude its form.
+</p>
+<p class="scatter">
+If you go by whistling, your nose a-tilt behind the whistle, you will know it from below: window sills, flapping curtains, fountains. 
+</p>
+<p>
+If you walk along hanging your head, your nails dug into the palms of your
+hands, your gaze will be held on the ground, in the gutters, the manhole
+covers, the fish scales, wastepaper.
 
-  <script>
-    const target = document.querySelector('.scatter');
-    const text = target.textContent;
-    target.textContent = '';
+You cannot say that one aspect of the city is truer than the other, but you hear of
+the upper Zemrude chiefly from those who remember it, as they sink into the lower
+Zemrude, following every day the same stretches of street and finding again each morning the
+ill-humor of the day before, encrusted at the foot of the walls. For everyone, sooner or later,
+the day comes when we bring our gaze down along the drainpipes and we can no longer detach it
+from the cobblestones. The reverse is not impossible, but it is more rare: and so we
+continue walking through Zemrude's streets with eyes now digging into the cellars, the
+foundations, the wells.
+</p>
+</div>
 
-    const spans = [];
+<script>
+const target = document.querySelector('.scatter');
+const text = target.textContent;
+target.textContent = '';
 
-    text.split('').forEach(char => {
-      if (char === ' ') {
-        target.appendChild(document.createTextNode(' '));
-      } else {
-        const span = document.createElement('span');
-        span.textContent = char;
-        target.appendChild(span);
-        spans.push(span);
-      }
-    });
+const spans = [];
+text.split('').forEach(char => {
+if (char === ' ') {
+target.appendChild(document.createTextNode(' '));
+} else {
+const span = document.createElement('span');
+span.textContent = char;
+target.appendChild(span);
+spans.push(span);
+}
+});
 
-    let scattered = false;
+const otherParagraphs = document.querySelectorAll('p:not(.scatter)');
 
-    function scatterTextWithGravity() {
-      if (scattered) return;
-      scattered = true;
+let currentMode = "default"; // "reality", "illusion"
 
-      spans.forEach(span => {
-        const angle = Math.random() * Math.PI * 2;
-        const velocity = Math.random() * 200 + 100;
-        const vx = Math.cos(angle) * velocity;
-        const vy = Math.sin(angle) * velocity - 300;
+function switchToReality() {
+if (currentMode === "reality") return;
+currentMode = "reality";
 
-        gsap.to(span, {
-          x: `+=${vx}`,
-          y: `+=${vy}`,
-          opacity: 0,
-          duration: 2,
-          ease: "power4.in",
-        });
-      });
+spans.forEach(span => {
+const angle = Math.random() * Math.PI * 2;
+const velocity = Math.random() * 200 + 100;
+const vx = Math.cos(angle) * velocity;
+const vy = Math.sin(angle) * velocity - 300;
 
-      window.removeEventListener('deviceorientation', handleOrientation);
-    }
+gsap.to(span, {
+x: `+=${vx}`,
+y: `+=${vy}`,
+opacity: 0,
+duration: 2,
+ease: "power4.in",
+});
+});
 
-    function handleOrientation(event) {
-      const beta = event.beta;
-      if (beta !== null && beta < -20) {  // 휴대폰이 화면이 위를 향할 때
-        scatterTextWithGravity();
-      }
-    }
+otherParagraphs.forEach(p => gsap.to(p, { opacity: 1, duration: 1 }));
+}
 
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', handleOrientation);
-    } else {
-      console.log("Device orientation not supported.");
-    }
-  </script>
+function switchToIllusion() {
+if (currentMode === "illusion") return;
+currentMode = "illusion";
+
+spans.forEach(span => {
+gsap.to(span, {
+x: 0,
+y: 0,
+opacity: 1,
+duration: 2,
+ease: "power2.out",
+});
+});
+
+otherParagraphs.forEach(p => gsap.to(p, { opacity: 0, duration: 1 }));
+}
+
+function handleOrientation(event) {
+const beta = event.beta;
+
+function updateGradient(beta) {
+let normalized = (beta + 90) / 270;
+normalized = Math.max(0, Math.min(1, normalized));
+
+const position = 100 - normalized * 100;
+document.body.style.backgroundPosition = `center ${position}%`;
+}
+
+
+
+
+
+
+
+
+
+
+if (beta !== null) {
+updateGradient(beta);
+      if (beta < 0) {
+      if (beta < 30) {
+switchToReality();  // 화면 위로 향할 때
+} else if (beta > 120) {
+switchToIllusion(); // 화면 아래로 향할 때
+}
+}
+}
+
+if (window.DeviceOrientationEvent) {
+window.addEventListener('deviceorientation', handleOrientation);
+}
+
+// 초기 상태 설정
+otherParagraphs.forEach(p => p.style.opacity = 1);
+</script>
+
+
 </body>
 </html>
