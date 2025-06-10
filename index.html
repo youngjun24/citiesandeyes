@@ -73,20 +73,12 @@
       font-weight: 400;
       font-size: 4vw;
       margin: 0 0 4vw 0;
-      /* 기본 p 태그는 초기에는 숨김 처리 (공간 유지) */
-      opacity: 0;
-      visibility: hidden; /* 스크린 리더 등에서도 접근성 제거 */
-      transition: opacity 0.5s ease; /* 부드러운 전환 효과 */
     }
 
-    /* .scatter p는 초기에도 보여야 하므로 재정의 */
-    p.scatter {
-      opacity: 1;
-      visibility: visible;
+    .scatter {
       position: relative;
       overflow: visible;
       word-break: keep-all;
-      transition: opacity 0.5s ease;
     }
 
     .scatter span {
@@ -100,12 +92,14 @@
     <h1>보이지 않는 도시들 –</h1>
     <h2>Cities and eyes 2</h2>
     <hr />
-    <p class="main-body-p"> It is the mood of the beholder which gives the city of Zemrude its form.
+    <p>
+      It is the mood of the beholder which gives the city of Zemrude its form.
     </p>
     <p class="scatter">
       If you go by whistling, your nose a-tilt behind the whistle, you will know it from below: window sills, flapping curtains, fountains. 
     </p>
-    <p class="main-body-p"> If you walk along hanging your head, your nails dug into the palms of your
+    <p>
+      If you walk along hanging your head, your nails dug into the palms of your
       hands, your gaze will be held on the ground, in the gutters, the manhole
       covers, the fish scales, wastepaper.
       
@@ -121,36 +115,30 @@
   </div>
 
   <script>
-    const scatterTarget = document.querySelector('.scatter');
-    const mainBodyParagraphs = document.querySelectorAll('p:not(.scatter)'); 
-    
-    // scatter 텍스트를 span으로 분리하는 초기 로직
-    const scatterTextContent = scatterTarget.textContent;
-    scatterTarget.textContent = ''; 
+    const target = document.querySelector('.scatter');
+    const text = target.textContent;
+    target.textContent = '';
 
-    const scatterSpans = [];
-    scatterTextContent.split('').forEach(char => {
+    const spans = [];
+
+    text.split('').forEach(char => {
       if (char === ' ') {
-        scatterTarget.appendChild(document.createTextNode(' '));
+        target.appendChild(document.createTextNode(' '));
       } else {
         const span = document.createElement('span');
         span.textContent = char;
-        gsap.set(span, { x: 0, y: 0, opacity: 1 }); // 초기 위치 및 투명도 설정
-        scatterTarget.appendChild(span);
-        scatterSpans.push(span);
+        target.appendChild(span);
+        spans.push(span);
       }
     });
 
-    // 폰을 아래로 내렸을 때 (beta < -20) 상태를 추적하는 변수
-    let isPhoneDownState = false; 
+    let scattered = false;
 
-    // scatter 텍스트를 흩어지게 하는 함수
-    function scatterText() {
-      // 이미 흩어진 상태라면 다시 흩어뜨리지 않습니다.
+    function scatterTextWithGravity() {
       if (scattered) return;
       scattered = true;
 
-      scatterSpans.forEach(span => {
+      spans.forEach(span => {
         const angle = Math.random() * Math.PI * 2;
         const velocity = Math.random() * 200 + 100;
         const vx = Math.cos(angle) * velocity;
@@ -164,59 +152,17 @@
           ease: "power4.in",
         });
       });
-    }
 
-    // scatter 텍스트를 원래대로 되돌리는 함수
-    function resetScatterText() {
-      // 흩어진 상태가 아니라면 되돌릴 필요가 없습니다.
-      if (!scattered) return;
-      scattered = false;
-
-      scatterSpans.forEach(span => {
-        gsap.to(span, {
-          x: 0,
-          y: 0,
-          opacity: 1,
-          duration: 0.5, // 되돌아오는 속도 조절
-          ease: "power2.out",
-        });
-      });
+      window.removeEventListener('deviceorientation', handleOrientation);
     }
 
     function handleOrientation(event) {
-      const beta = event.beta; 
-      
-      // 폰을 아래로 내렸을 때 (화면이 위를 향할 때, beta < -20)
-      if (beta !== null && beta < -20) {
-        // 이 상태로 진입한 적이 없다면
-        if (!isPhoneDownState) {
-          isPhoneDownState = true; // 상태 변경
-          
-          // 1. .scatter 텍스트를 흩어지게 만듭니다.
-          scatterText();
-
-          // 2. 나머지 본문 텍스트를 보이게 합니다.
-          mainBodyParagraphs.forEach(p => {
-            gsap.to(p, { opacity: 1, visibility: 'visible', duration: 0.5 });
-          });
-        }
-      } else { // 폰이 정상 위치 (혹은 위로 들었을 때)
-        // '폰을 아래로 내렸을 때' 상태에서 벗어났다면
-        if (isPhoneDownState) {
-          isPhoneDownState = false; // 상태 변경
-
-          // 1. .scatter 텍스트를 원래대로 되돌립니다.
-          resetScatterText();
-
-          // 2. 나머지 본문 텍스트를 숨깁니다.
-          mainBodyParagraphs.forEach(p => {
-            gsap.to(p, { opacity: 0, visibility: 'hidden', duration: 0.5 });
-          });
-        }
+      const beta = event.beta;
+      if (beta !== null && beta < -20) {  // 휴대폰이 화면이 위를 향할 때
+        scatterTextWithGravity();
       }
     }
 
-    // 페이지 로드 시 deviceorientation 이벤트 리스너 추가
     if (window.DeviceOrientationEvent) {
       window.addEventListener('deviceorientation', handleOrientation);
     } else {
