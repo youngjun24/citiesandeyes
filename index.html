@@ -122,30 +122,31 @@
 
   <script>
     const scatterTarget = document.querySelector('.scatter');
-    // .scatter 클래스가 아닌 모든 p 태그를 선택합니다. (일반 본문 텍스트)
     const mainBodyParagraphs = document.querySelectorAll('p:not(.scatter)'); 
     
-    // scatter 텍스트를 span으로 분리하는 기존 로직 (초기화)
+    // scatter 텍스트를 span으로 분리하는 초기 로직
     const scatterTextContent = scatterTarget.textContent;
-    scatterTarget.textContent = ''; // 원래 텍스트를 비워주고 span으로 채울 준비
+    scatterTarget.textContent = ''; 
 
     const scatterSpans = [];
-
     scatterTextContent.split('').forEach(char => {
       if (char === ' ') {
         scatterTarget.appendChild(document.createTextNode(' '));
       } else {
         const span = document.createElement('span');
         span.textContent = char;
+        gsap.set(span, { x: 0, y: 0, opacity: 1 }); // 초기 위치 및 투명도 설정
         scatterTarget.appendChild(span);
         scatterSpans.push(span);
       }
     });
 
-    let scattered = false; // scatter 텍스트가 흩어졌는지 추적하는 플래그
+    // 폰을 아래로 내렸을 때 (beta < -20) 상태를 추적하는 변수
+    let isPhoneDownState = false; 
 
-    function scatterTextWithGravity() {
-      // 텍스트가 이미 흩어졌으면 다시 실행하지 않습니다.
+    // scatter 텍스트를 흩어지게 하는 함수
+    function scatterText() {
+      // 이미 흩어진 상태라면 다시 흩어뜨리지 않습니다.
       if (scattered) return;
       scattered = true;
 
@@ -163,58 +164,61 @@
           ease: "power4.in",
         });
       });
-      // 흩어지는 효과가 발생한 후에는 deviceorientation 리스너를 제거합니다.
-      // 이렇게 하지 않으면 폰을 다시 움직일 때마다 계속 흩어지려고 할 수 있습니다.
-      window.removeEventListener('deviceorientation', handleOrientation);
+    }
+
+    // scatter 텍스트를 원래대로 되돌리는 함수
+    function resetScatterText() {
+      // 흩어진 상태가 아니라면 되돌릴 필요가 없습니다.
+      if (!scattered) return;
+      scattered = false;
+
+      scatterSpans.forEach(span => {
+        gsap.to(span, {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          duration: 0.5, // 되돌아오는 속도 조절
+          ease: "power2.out",
+        });
+      });
     }
 
     function handleOrientation(event) {
-      const beta = event.beta; // X축을 중심으로 한 기기 기울기 (앞뒤)
+      const beta = event.beta; 
       
-      // 베타 값이 null이 아니고, 폰을 아래로 내렸을 때 (화면이 위를 향할 때, beta < -20)
+      // 폰을 아래로 내렸을 때 (화면이 위를 향할 때, beta < -20)
       if (beta !== null && beta < -20) {
-        // 이전에 흩어진 텍스트를 되돌려야 할 경우 (선택 사항, 복잡도 증가)
-        // 현재 로직은 한 번 흩어지면 유지되도록 합니다.
-        // 만약 폰을 다시 올렸을 때 흩어진 텍스트가 원래대로 돌아오고
-        // 본문이 사라지며 다시 초기 상태가 되려면 이 부분에 리셋 로직이 필요합니다.
-        // 하지만 요청은 "나머지 js 로직은 전부 그대로 유지"이므로, 흩어진 후에는 유지됩니다.
-        
-        // 1. .scatter 텍스트를 흩어지게 만듭니다.
-        scatterTextWithGravity();
+        // 이 상태로 진입한 적이 없다면
+        if (!isPhoneDownState) {
+          isPhoneDownState = true; // 상태 변경
+          
+          // 1. .scatter 텍스트를 흩어지게 만듭니다.
+          scatterText();
 
-        // 2. 나머지 본문 텍스트를 보이게 합니다.
-        mainBodyParagraphs.forEach(p => {
-          gsap.to(p, { opacity: 1, visibility: 'visible', duration: 0.5 });
-        });
-
-      } else { // 폰이 정상 위치 (혹은 위로 들었을 때)
-        // 1. .scatter 텍스트가 흩어진 상태라면, 이를 되돌리는 시도를 합니다.
-        //    (여기서는 흩어짐을 초기화하고 다시 원본 상태로 돌립니다)
-        if (scattered) {
-          scatterSpans.forEach(span => {
-            // 초기 위치로 되돌리면서 투명도를 1로 만듭니다.
-            gsap.to(span, { x: 0, y: 0, opacity: 1, duration: 0.5, ease: "power2.out" });
+          // 2. 나머지 본문 텍스트를 보이게 합니다.
+          mainBodyParagraphs.forEach(p => {
+            gsap.to(p, { opacity: 1, visibility: 'visible', duration: 0.5 });
           });
-          scattered = false; // 흩어짐 상태 해제
-
-          // 흩어짐이 리셋되었으므로, 다시 deviceorientation 리스너를 추가하여
-          // 다음 각도 변화에 반응하도록 합니다. (중복 추가 방지)
-          if (window.DeviceOrientationEvent && !window.listenerAdded) {
-              window.addEventListener('deviceorientation', handleOrientation);
-              window.listenerAdded = true;
-          }
         }
-        // 2. 나머지 본문 텍스트를 숨깁니다.
-        mainBodyParagraphs.forEach(p => {
-          gsap.to(p, { opacity: 0, visibility: 'hidden', duration: 0.5 });
-        });
+      } else { // 폰이 정상 위치 (혹은 위로 들었을 때)
+        // '폰을 아래로 내렸을 때' 상태에서 벗어났다면
+        if (isPhoneDownState) {
+          isPhoneDownState = false; // 상태 변경
+
+          // 1. .scatter 텍스트를 원래대로 되돌립니다.
+          resetScatterText();
+
+          // 2. 나머지 본문 텍스트를 숨깁니다.
+          mainBodyParagraphs.forEach(p => {
+            gsap.to(p, { opacity: 0, visibility: 'hidden', duration: 0.5 });
+          });
+        }
       }
     }
 
     // 페이지 로드 시 deviceorientation 이벤트 리스너 추가
     if (window.DeviceOrientationEvent) {
       window.addEventListener('deviceorientation', handleOrientation);
-      window.listenerAdded = true; // 리스너 추가 여부 플래그
     } else {
       console.log("Device orientation not supported.");
     }
