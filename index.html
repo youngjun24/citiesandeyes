@@ -79,8 +79,8 @@ margin: 0 0 4vw 0;
 /* 초기 상태: scatter를 제외한 다른 p 태그는 숨김 */
 opacity: 0;
 visibility: hidden; /* 공간은 유지하되 보이지 않게 */
-/* transition 속성은 이제 JS (GSAP)에서 직접 제어하므로 여기서는 제거해도 됩니다. */
-/* visibility 전환은 GSAP onComplete 콜백에서 제어됩니다. */
+/* GSAP가 opacity를 제어하므로 CSS transition은 필요 없지만, fallback으로 남겨둘 수도 있습니다. */
+transition: opacity 0.5s ease; /* visibility는 GSAP onStart/onComplete로 제어 */
 }
 
 /* scatter 클래스를 가진 p 태그는 초기에도 보이도록 오버라이드 */
@@ -90,7 +90,6 @@ visibility: visible;
 position: relative;
 overflow: visible;
 word-break: keep-all;
-/* scatter span의 transform과 opacity는 JS에서 제어하므로 여기서는 그대로 둡니다. */
 }
 
 .scatter span {
@@ -137,7 +136,6 @@ target.appendChild(document.createTextNode(' '));
 } else {
 const span = document.createElement('span');
 span.textContent = char;
-// 초기에는 모든 span이 원래 위치에 투명도 1로 보이도록 설정
 gsap.set(span, { x: 0, y: 0, opacity: 1 });
 target.appendChild(span);
 spans.push(span);
@@ -148,9 +146,9 @@ const otherParagraphs = document.querySelectorAll('p:not(.scatter)');
 
 let currentMode = "illusion"; // 초기 모드를 "illusion"으로 설정 (scatter만 보이는 상태)
 
-// 텍스트를 흩어지게 하고 나머지 본문을 보이게 하는 함수 (원본 switchToReality 이름 유지)
+// 텍스트를 흩어지게 하고 나머지 본문을 보이게 하는 함수
 function switchToReality() {
-if (currentMode === "reality") return; // 이미 reality 상태면 아무것도 안함
+if (currentMode === "reality") return;
 currentMode = "reality";
 
 spans.forEach(span => {
@@ -168,16 +166,22 @@ ease: "power4.in",
 });
 });
 
-// 본문 나타날 때는 visibility: 'visible'을 즉시 적용하고 opacity 애니메이션
+// ⭐ 수정된 부분: 본문이 나타날 때 visibility를 먼저 visible로 설정하고 opacity 애니메이션 시작 ⭐
 otherParagraphs.forEach(p => {
-    p.style.visibility = 'visible'; // 먼저 보이게 설정
-    gsap.to(p, { opacity: 1, duration: 1, ease: "power2.out" });
+    gsap.to(p, {
+        opacity: 1,
+        duration: 1, // 나타나는 시간 (1초)
+        ease: "power2.out",
+        onStart: () => { // 애니메이션 시작 시 실행
+            p.style.visibility = 'visible'; // 그때서야 visibility를 visible로 변경
+        }
+    });
 });
 }
 
-// 텍스트를 원래대로 되돌리고 나머지 본문을 숨기는 함수 (원본 switchToIllusion 이름 유지)
+// 텍스트를 원래대로 되돌리고 나머지 본문을 숨기는 함수
 function switchToIllusion() {
-if (currentMode === "illusion") return; // 이미 illusion 상태면 아무것도 안함
+if (currentMode === "illusion") return;
 currentMode = "illusion";
 
 spans.forEach(span => {
@@ -190,14 +194,14 @@ ease: "power2.out",
 });
 });
 
-// ⭐ 수정된 부분: opacity 애니메이션이 완료된 후에 visibility를 hidden으로 설정합니다. ⭐
+// ⭐ 수정된 부분: opacity 애니메이션이 완료된 후에 visibility를 hidden으로 설정 ⭐
 otherParagraphs.forEach(p => {
     gsap.to(p, {
         opacity: 0,
-        duration: 1, // 1초 동안 opacity가 0으로 변합니다.
-        ease: "power2.out", // 부드러운 사라짐을 위해 ease 추가 (선택 사항)
-        onComplete: () => { // opacity 애니메이션이 완료된 후 실행될 콜백 함수
-            p.style.visibility = 'hidden'; // 그제서야 visibility를 hidden으로 변경
+        duration: 1, // 사라지는 시간 (1초)
+        ease: "power2.out",
+        onComplete: () => { // 애니메이션 완료 시 실행
+            p.style.visibility = 'hidden'; // 그때서야 visibility를 hidden으로 변경
         }
     });
 });
@@ -218,13 +222,13 @@ document.body.style.backgroundPosition = `center ${position}%`;
 if (beta !== null) {
 updateGradient(beta);
 // 폰을 아래로 내렸을 때 (화면이 위로 향할 때)
-if (beta < 0) { // 원본 코드의 조건
-  if (beta < 30) { // 원본 코드의 조건 (화면 위로 향할 때)
+if (beta < 0) {
+  if (beta < 30) {
     switchToReality();
   }
 }
 // 폰을 위로 올렸을 때 (화면이 아래로 향할 때)
-else if (beta > 120) { // 원본 코드의 조건 (화면 아래로 향할 때)
+else if (beta > 120) {
   switchToIllusion();
 }
 }
@@ -235,15 +239,9 @@ window.addEventListener('deviceorientation', handleOrientation);
 }
 
 // 페이지 로드 시 초기 상태를 설정합니다.
-// 다른 P태그들을 숨깁니다.
-// CSS에서 이미 opacity:0, visibility:hidden으로 초기 설정했으므로
-// GSAP set을 사용하면 transition이 적용되지 않습니다.
-// GSAP to를 사용하지 않으므로 CSS의 transition이 적용됩니다.
-// 하지만 안전하게 JS로 초기화하는 것이 더 좋습니다.
 otherParagraphs.forEach(p => {
     gsap.set(p, { opacity: 0, visibility: 'hidden' });
 });
-
 </script>
 </body>
 </html>
